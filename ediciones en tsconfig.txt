@@ -1,0 +1,37 @@
+Con (control + F) se busca, por lo cual si se quiere hacer alguna consulta ir hacia
+este archivo y póngase a buscar.
+
+    "outDir": "./dist"
+
+        --->En que directorio se va a guardar la traducción , en este caso, /dist.
+
+    
+    "rootDir": "./src"
+
+        --->En donde va a estar el código fuente, en este caso en /src.
+
+    "strict": true
+
+        --->Chequeo de tipo de dato, si usted como persona inerte, absurda, catrehp,
+            soplatubos, negro cirilo, cuadro de pintura enardecida, aborto fallido lo toca
+            dejeme decirle que usted no vale como persona, como programador, como estudiante,
+            como trabajador,como hijo, como padre, como hermano, como sobrino, como novio, como esposo,
+            como  amigo, como enemigo, como vecino, como cliente, como proveedor, como mascota,
+            como ser humano, como ser vivo, como ser pensante, como ser, bueno tu me entiendes.
+
+
+--------------------------------------------------------->
+
+Abajo del todo se incluyeron dos propiedades más, las cuales son:
+
+      "include": ["src/**/*ts"]
+
+        --->hay que incluirle que archivos tiene que leer, por lo cual ahí dice que incluya a cualquier archivo
+            que tenga la extensión ts dentro de la carpeta src o cualquiera dentro de sus carpetas hijas, chapishme?.
+
+      "exclude": ["node_modules"]
+
+        --->que no lea nada de lo que hay dentro de node_modules, esta carpeta talvez no aparezca al clonarla debido a que
+            está siendo ignorada por el .gitignore para no tener q cargarla en el repo, para que te aparezca debes instalar los
+            paquetes con npm install, y luego puedes verla, pero no la lea, es muy grande,
+            MÁS GRANDE QUE MI..."este mensaje ha sido borrado por las normas de la comunidad"
