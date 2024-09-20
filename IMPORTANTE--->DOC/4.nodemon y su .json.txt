@@ -1,0 +1,27 @@
+Si quieres ejecutar y compilar el código de forma automática, el proyecto ya cuenta con la dependencia
+de nodemon, por lo cual solo debes escribir:
+
+    --->npm start
+
+        este comando funciona debido a que fue escrito en el package.json, esto ya fue dicho en el archivo
+        "1.dependencias instaladas.txt", si no lo ha leído vaya y no le pregunte a gepeto, vago de mierda.
+
+-------------->
+
+nodemon está configurado para que funcione en este proyecto en el archivo "nodemon.json", el cual tiene
+3 propiedades:
+
+    --->"watch":["src"]
+    --->"ext":"ts"
+    --->"exec":"ts-node src/index.ts"
+
+estará obvservando a la carpeta src a todo archivo con extensión ".ts",
+al encontrar un cambio ejecutará ts-node src/index.ts .
+
+-------------->
+
+    Noviembre sin ti es sentir que la lluvia
+    Me dice llorando que todo acabo
+    Noviembre sin ti es pedirle a la luna
+    Que brille en la noche de mi corazón
+    Otra vez, otra vez.

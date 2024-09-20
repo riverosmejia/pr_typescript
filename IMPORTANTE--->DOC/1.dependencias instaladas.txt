@@ -22,11 +22,11 @@
 
         "lint": "eslint . --ext .ts",
         "build": "tsc",
-        "start": "node dist/index.js"
+        "start": "nodemon src/index.ts"
 
         npm run build: compila el proyecto.
 
         npm start: ejecuta el proyecto.
 
-        npm run mario: clear + SUPERMARIOBROTHERS WAHOOOOO!
+        npm run mario: SUPERMARIOBROTHERS WAHOOOOO!
 

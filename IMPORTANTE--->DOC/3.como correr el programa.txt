@@ -1,0 +1,16 @@
+Primero que nada, typescript es un lenguaje que se compila para después ejecutarlo,
+por lo cual debes compilar tu proyecto y después ejecutarlo, ¿cómo? así:
+
+    --->npx tsc
+
+            Compila el proyecto, creará los archivos .js en la carpeta dist, preconfigurado en el
+            tsconfig.json, si se tiene alguna duda sobre esto por favor ir al archivo "2.ediciones en tsconfig.txt".
+
+    --->npm start
+
+            Ejecuta el proyecto, por favor compilar antes porque sino ejecutará código pasado y no se verá nigún
+            cambio.
+
+------->Cabe aclarar que esto es la opción de forma manual, compilar y ejecutar en la terminal cada que haya un cambio y
+        revuelo y bla bla bla,  pero si quieres hacerlo de forma automática, es recomendable que se use el nodemon (explicado en el archivo de texto siguente).
+        
