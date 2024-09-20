@@ -22,7 +22,7 @@
 
         "lint": "eslint . --ext .ts",
         "build": "tsc",
-        "start": "nodemon src/index.ts"
+        "start": "nodemon"
 
         npm run build: compila el proyecto.
 
@@ -30,3 +30,9 @@
 
         npm run mario: SUPERMARIOBROTHERS WAHOOOOO!
 
+---> npm install -D dotenv
+
+    este instala dotenv, librería que permite usar variables de entorno,
+    para que no tengamos que poner por ejemplo las credenciales de la
+    base de datos en el código y subamos las mismas a un github , que
+    es un lugar público.
