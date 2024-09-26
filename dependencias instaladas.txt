@@ -1,0 +1,18 @@
+---> npm init 
+
+    (iniciar el proyecto)
+
+---> npm install --save-dev typescript @types/express @types/node nodemon ts-node express
+
+    (instalar typescript de forma local, me han recomendado eso :p)
+
+--->npm install -D <dependencia>
+
+    (morgan,express,nodemon,tso-node)
+
+    además de esas hay otras dos, pero se instalaron solas cuando
+    lo instalé typescript de forma local, revisar por favor que estén
+
+    (@types/express,@types/node)
+
+--->

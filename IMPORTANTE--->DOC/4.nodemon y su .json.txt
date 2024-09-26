@@ -15,7 +15,7 @@ nodemon está configurado para que funcione en este proyecto en el archivo "node
     --->"ext":"ts"
     --->"exec":"ts-node src/index.ts"
 
-estará obvservando a la carpeta src a todo archivo con extensión ".ts",
+estará observando a la carpeta src a todo archivo con extensión ".ts",
 al encontrar un cambio ejecutará ts-node src/index.ts .
 
 -------------->

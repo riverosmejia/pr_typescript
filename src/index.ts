@@ -1,5 +1,13 @@
-console.log("hola");
+//const server=require("./server"); esto genera error a la hora de importar
 
-const num:number=3;
+import server from './server';
 
-console.log(num);
+import { PORT } from './config/envs';
+
+server.listen(PORT,listen);
+
+function listen(){
+
+    console.log(`server listening on port ${PORT}`);
+
+}
