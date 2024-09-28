@@ -3,8 +3,14 @@ import I_UserData from "../../../dto/I_dto";
 import I_Credential from "../../../dto/I_Credential";
 import I_User from "../../../dto/I_User";
 import {createCredentialS} from "../../../service/credentialService"
+import {AppDataSource} from "../../../config/appDataSource";
+import { User } from "../../../entities/User";
+import {Credential} from "../../../entities/Credential";
+import { RelationId } from "typeorm";
+import { Appointment } from "../../../entities/Appointment";
 
-
+const Model = (entity: any) => AppDataSource.getRepository(entity);
+/*
 const Users: I_User[] = [
     {
         id: 1,
@@ -42,75 +48,113 @@ const Credentials: I_Credential[] = [
     }
 ];
 
-let id_=Users.length;
+*/
 
-export const createUserS = async (userData: I_UserData): Promise<I_User> => {
+export const createUserS = async (userData: I_UserData): Promise<User> => {
+    const userRepository = Model(User);
+    const credentialRepository = Model(Credential);
+  
+    // Crear la credencial primero
+    const newCredential = credentialRepository.create({
+        username: userData.email, // Asumiendo que el email será el username
+        password: userData.password,
+    });
+    
+    // Guardar la credencial
+    const savedCredential = await credentialRepository.save(newCredential);
 
-    const credentialsId = await createCredentialS(userData.email, userData.password); // Crear credenciales
-
-    let nextUserId=id_+1;
-
-    const newUser: I_User = {
-        id: nextUserId, // Asignar nuevo ID
+    // Crear el usuario con la relación a Credential
+    const user = userRepository.create({
         name: userData.name,
+        password: userData.password,
         email: userData.email,
-        password: userData.password, // Esto puede ser mejorado; considera no almacenar la contraseña en texto claro.
         birthdate: userData.birthdate,
         nDni: userData.nDni,
-        credentialsId,
-        role: userData.role
-    };
+        role: userData.role,
+        credential: savedCredential, // Relación con Credential
+    });
 
-    Users.push(newUser); // Agregar el nuevo usuario
-    return newUser; // Retornar el nuevo usuario
+    // Guardar el usuario
+    const result = await userRepository.save(user) as User;
+    
+    return result;
 };
 
+
+
+
 export const deleteUserS = async (id: number): Promise<void> => {
-
-    const index = Users.findIndex(user => user.id === id);
-
-    if (index !== -1) {
-
-        Users.splice(index, 1); // Eliminar el usuario
-
+    const userRepository = Model(User);
+    const user = await userRepository.findOneBy({ id });
+    
+    if (user) {
+        await userRepository.remove(user); // Eliminar el usuario
     } else {
-
         throw new Error("Usuario no encontrado");
-
     }
 };
 
 
-export const getUsersS = async (): Promise<I_User[]> => {
-  
-    return Users;
+export const getUserS = async ():Promise<User[]> => {
+    const userRepository = Model(User);
+    const users:User[] = await userRepository.find({
+        
+        relations:{
 
+            credential:true,
+            appointments:true
+
+        }
+
+    })as User[];
+    return users;
 };
+/*
+export const getUserS = async (): Promise<User[]> => {
+    const userRepository = Model(User);
+    const users: User[] = await userRepository.find({
+        relations: ["credential"], // Debes usar "relations" con un arreglo de strings
+    });
 
-export const getUserByIdS = async (id: number): Promise<I_User | null> => {
-    const user = Users.find(u => u.id === id);
-    return user || null; // Retorna el usuario o null si no se encuentra
+    return users;
+};
+*/
+
+export const getUserByIdS = async (id: number):Promise<User|null>=> {
+    const userRepository = Model(User);
+
+    const user:User|null = await userRepository.findOne({
+    
+        where:{id},
+        
+        relations:{ 
+
+            credential:true
+
+        }
+        
+    })as User | null;
+    
+    return user;
 };
 
 export const loginUserS = async (username: string, password: string): Promise<I_User | null> => {
-    
-    // Buscar las credenciales que coincidan con el username y password
-    const credential: I_Credential | undefined = Credentials.find(
+    const credentialRepository = Model(Credential);
+    const userRepository = Model(User);
 
-        cred => cred.username === username && cred.password === password
-    
-    );
+    // Buscar las credenciales en la base de datos
+    const credential = await credentialRepository.findOne({
+        where: { username, password }
+    });
 
     if (!credential) {
-
-        // Si no se encuentran las credenciales, retornar null
-        return null;
-    
+        return null; // Retornar null si no se encuentra la credencial
     }
 
-    // Buscar el usuario correspondiente a esas credenciales
-    const user: I_User | undefined = Users.find(user => user.credentialsId === credential.id);
+    // Buscar el usuario asociado a las credenciales
+    const user:I_User = await userRepository.findOne({
+        where: { credentialsId: credential.id }
+    })as I_User;
 
-    // Devolver el usuario si lo encuentra, o null si no existe
-    return user || null;
+    return user || null; // Retornar el usuario o null si no se encuentra
 };

@@ -1,11 +1,10 @@
 
-interface I_Credential{
+interface I_Credential {
 
-    id:number,
-    username:string,
-    password:string
-
+    username: string;
+    password: string;
 }
+
 
 export default  I_Credential;
 

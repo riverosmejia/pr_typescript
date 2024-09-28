@@ -4,7 +4,7 @@ import { getAllAppointments, getAppointmentById, scheduleAppointment, cancelAppo
 const appointmentRouter = Router();
 
 appointmentRouter.get('/appointments', getAllAppointments);
-appointmentRouter.get('/appointments/:id', getAppointmentById);
+appointmentRouter.get('/appointment/:id', getAppointmentById);
 appointmentRouter.post('/appointments/schedule', scheduleAppointment);
 appointmentRouter.put('/appointments/cancel', cancelAppointment);
 

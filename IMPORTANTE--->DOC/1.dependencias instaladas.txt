@@ -6,6 +6,11 @@
 
     (instalar typescript de forma local, me han recomendado eso :p)
 
+--->npm install moment
+
+    se usa para manejar el tiempo en el proyecto, se puede ver en la interfaz I_appointment y en los servicios
+    del appointment.
+
 --->npm install -D <dependencia>
 
     (morgan,express,nodemon,tso-node)

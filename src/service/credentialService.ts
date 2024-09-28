@@ -1,18 +1,28 @@
 import I_Credential from '../dto/I_Credential';
 
+import { Credential } from '../entities/Credential';
+
+import { AppDataSource } from '../config/appDataSource';
+
+const Model = (entity: any) => AppDataSource.getRepository(entity);
+
 let Credentials: I_Credential[] = []; // Arreglo para precarga de datos
 let nextId = 1; // ID para el nuevo par de credenciales
 
 // Función para crear un nuevo par de credenciales
 export const createCredentialS = async (username: string, password: string): Promise<number> => {
-    const newCredential: I_Credential = {
-        id: nextId++, // Asignar un nuevo ID
+    const credentialRepository = Model(Credential); // Usar el modelo para obtener el repositorio
+
+    const newCredential = credentialRepository.create({
         username,
         password
-    };
-    Credentials.push(newCredential); // Agregar a la lista de credenciales
-    return newCredential.id; // Retornar el ID
+    });
+
+    const savedCredential = await credentialRepository.save(newCredential);
+    return savedCredential.id; // Retornar el ID de la credencial guardada
 };
+
+
 
 // Función para validar credenciales
 export const validateCredentialS = async (username: string, password: string): Promise<number | null> => {

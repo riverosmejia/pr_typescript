@@ -1,17 +1,21 @@
+import I_Credential from "./I_Credential";
+
+
 interface I_User {
 
-    id:number,
-    name:string,
-    email:string,
-    password:string,
-    birthdate:Date,
-    nDni:number,
-    credentialsId:number,
-    role:string
+
+    name: string;
+    email: string;
+    password: string;
+    birthdate: Date;
+    nDni: number;
+    role: string;
+
 
 }
 
 export default I_User;
+
 
 /*
 

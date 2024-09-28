@@ -1,15 +1,17 @@
+import moment from 'moment';
 
-interface I_Appoinment{
+interface I_Appoinment {
 
-    id:number,
-    date:Date,
-    time:string,
-    userId:number,
-    status:boolean
+    date: Date;
+    time: moment.Moment; // Mantén esto como Moment
+    userId: number;
+    status: boolean; // true-->activo, false-->inactivo
 
 }
 
 export default I_Appoinment;
+
+
 
 /*
     

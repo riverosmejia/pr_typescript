@@ -7,7 +7,7 @@ const router:Router = Router();
 
 //obtener todos los usuarios
 
-router.get("/users",auth,getAllUser);
+router.get("/users",getAllUser);
 
 //obtener usuario por ID
 
@@ -19,6 +19,6 @@ router.post("/users",createUser);
 
 //borrar un usuario
 
-router.delete("/users:id",deleteUser);
+router.delete("/user/:id",deleteUser);
 
 export default router;

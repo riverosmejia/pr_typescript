@@ -1,21 +1,35 @@
 import { Request,Response } from "express";
 import { createUserS,deleteUserS,getUserS,getUserByIdS,loginUserS } from "./services/userService";
 import I_User from "../../dto/I_User";
+import I_UserData from "../../dto/I_dto";
+import { User } from "../../entities/User";
 
-export const createUser=async (req:Request,res:Response)=>{
+/*
+en los controladores createUser, deleteUser, getAllUser no deja colocar controladores,
+lo identifica todo como ObjectLiteral, por qué? no se, si no se encuentran las interfaces es porque
+al entregar el trabajo no encontré el error
+*/
 
-    const {name,email,password,role,birthdate,credentialsId,nDni}=req.body
+export const createUser = async (req: Request, res: Response) => {
+    const { name, email, password, role, birthdate, nDni } = req.body; // Eliminar credentialsId
 
-    const newUser:I_User=await createUserS({name,email,password,role,birthdate,credentialsId,nDni});
+    try {
+        const newUser = await createUserS({ name, email, password, role, birthdate, nDni }); // Crear el nuevo usuario
 
-    res.status(200).json(newUser);
+        res.status(201).json(newUser); // Cambiar a 201 para indicar creación exitosa
+    } catch (err) {
 
+        const error = err as Error;
+        res.status(500).json({ message: error.message }); // Manejo de errores
+    }
 };
 
 export const deleteUser = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;  // Ahora obtenemos el ID desde los parámetros
         const userId = parseInt(id);
+
+        console.log(id)
 
         await deleteUserS(userId);
 
@@ -27,10 +41,13 @@ export const deleteUser = async (req: Request, res: Response) => {
 
 export const getAllUser=async (req:Request,res:Response)=>{
     
-    const users:I_User[] = await getUserS();
+    const users = await getUserS();
+
+    if(users){
 
     res.status(200).json(users);
 
+    }
 } ;
 
 export const getUserById = async (req: Request, res: Response) => {
