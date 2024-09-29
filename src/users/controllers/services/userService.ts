@@ -5,7 +5,7 @@ import { User } from "../../../entities/User";
 import {Credential} from "../../../entities/Credential";
 import userRepository from "../../../repositories/UserRepository";
 
-export const createUserS = async (userData: I_UserData): Promise<User|string> => {
+export const createUserS = async (userData:I_UserData): Promise<User|string> => {
     const queryRunner = AppDataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -86,16 +86,6 @@ export const getUserS = async ():Promise<User[]> => {
     })as User[];
     return users;
 };
-/*
-export const getUserS = async (): Promise<User[]> => {
-    const userRepository = Model(User);
-    const users: User[] = await userRepository.find({
-        relations: ["credential"], // Debes usar "relations" con un arreglo de strings
-    });
-
-    return users;
-};
-*/
 
 export const getUserByIdS = async (id: number):Promise<User|null>=> {
 

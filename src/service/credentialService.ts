@@ -1,7 +1,3 @@
-import I_Credential from '../dto/I_Credential';
-
-import { AppDataSource } from '../config/appDataSource';
-
 import { Credential } from '../entities/Credential';
 
 import credentialRepository from '../repositories/CredentialRepository';

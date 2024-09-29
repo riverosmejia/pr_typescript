@@ -1,36 +1,10 @@
-import { Request, Response } from 'express';
 import moment from 'moment';
 import  I_Appoinment  from '../../../dto/I_appoinment'; 
 import I_AppointmentResponse from '../../../dto/I_appointmentResponse';
-import {AppDataSource} from "../../../config/appDataSource";
 import { Appointment,AppointmentStatus } from '../../../entities/Appointment';
-
-const Model = (entity: any) => AppDataSource.getRepository(entity);
-
-/*
-let appointments: I_Appoinment[] = [
-    {
-        id: 1,
-        userId: 1,
-        date: new Date("2024-09-30"),
-        time: moment('10:00', 'HH:mm'),
-        status: true // Activo
-    },
-    {
-        id: 2,
-        userId: 2,
-        date: new Date("2024-10-01"),
-        time: moment('10:30','HH:mm'),
-        status: true // Activo
-    }
-];
-*/
-
-// Obtener el listado de todos los turnos
-// Obtener el listado de todos los turnos
+import appointmentRepository from '../../../repositories/AppointmentRepository';
 
 export const getAllAppointmentsS = async (): Promise<I_AppointmentResponse[]> => {
-    const appointmentRepository = Model(Appointment);
 
     // Cargar las relaciones con 'user'
     const appointments: Appointment[] = await appointmentRepository.find({
@@ -55,7 +29,6 @@ export const getAllAppointmentsS = async (): Promise<I_AppointmentResponse[]> =>
 
 
 export const getAppointmentByIdS = async (id: number): Promise<I_AppointmentResponse | null> => {
-    const appointmentRepository = Model(Appointment);
 
     const appointment = await appointmentRepository.findOne({
         where: { id },
@@ -76,29 +49,33 @@ export const getAppointmentByIdS = async (id: number): Promise<I_AppointmentResp
 };
 
 // Agendar un nuevo turno
-export const scheduleAppointmentS = async (newAppointment: I_Appoinment): Promise<Appointment> => {
-    const appointmentRepository = Model(Appointment);
+export const scheduleAppointmentS = async (newAppointment: I_Appoinment): Promise<Appointment|string> => {
+
+    // Verifica que el tiempo sea válido y formatea
+    const formattedTime = moment(newAppointment.time, 'HH:mm', true); // true para modo estricto
+    if (!formattedTime.isValid()) {
+        return 'El formato de la hora no es válido. Debe ser HH:mm.';
+    }
 
     const appointment = appointmentRepository.create({
         user: { id: newAppointment.userId }, // Relacionar el usuario
         date: newAppointment.date,
-        time: newAppointment.time,
-        status: 'active',
+        time: formattedTime.format('HH:mm'), // Formatea el tiempo correctamente
+        status: AppointmentStatus.ACTIVE,
     });
 
-    const result=await appointmentRepository.save(appointment) as Appointment;
+    const result = await appointmentRepository.save(appointment) as Appointment;
 
     return result;
 };
 
 // Cambiar el estatus de un turno a “cancelled”
 export const cancelAppointmentS = async (id: number): Promise<Appointment | null> => {
-    const appointmentRepository = Model(Appointment);
 
-    const appointment = await appointmentRepository.findOneBy({ id });
+    const appointment:Appointment = await appointmentRepository.findOneBy({ id }) as Appointment;
 
     if (appointment) {
-        appointment.status = 'cancelled'; // Cambia el estado a "cancelled"
+        appointment.status=AppointmentStatus.CANCELLED; // Cambia el estado a "cancelled"
         const result = await appointmentRepository.save(appointment) as Appointment|null;
         return result;
     }
