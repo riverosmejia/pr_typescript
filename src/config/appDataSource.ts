@@ -12,7 +12,9 @@ export const AppDataSource = new DataSource({
     password: PASSWORD,
     database: DATABASE,
     synchronize: true,
+    //el de abajo es para quitar o poner los datos de SQL en la terminal.
     logging: true,
+    //el de abajo es para quitar datos cada vez que se reinicie el programa
     dropSchema:true,
     entities: [User, Appointment, Credential],
     subscribers: [],
@@ -20,6 +22,6 @@ export const AppDataSource = new DataSource({
 });
 
 // Función para obtener el repositorio de una entidad específica
-/*export const getRepository = <Entity>(entity: new () => Entity) => {
+export const getRepository = <Entity>(entity: new () => Entity) => {
     return AppDataSource.getRepository(entity);
-};*/
+};

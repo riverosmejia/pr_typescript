@@ -1,90 +1,68 @@
-import { promises } from "dns";
 import I_UserData from "../../../dto/I_dto";
-import I_Credential from "../../../dto/I_Credential";
-import I_User from "../../../dto/I_User";
-import {createCredentialS} from "../../../service/credentialService"
+import {createCredentialS,validateCredentialS,SavedUserInCredentialS} from "../../../service/credentialService"
 import {AppDataSource} from "../../../config/appDataSource";
 import { User } from "../../../entities/User";
 import {Credential} from "../../../entities/Credential";
-import { RelationId } from "typeorm";
-import { Appointment } from "../../../entities/Appointment";
+import userRepository from "../../../repositories/UserRepository";
 
-const Model = (entity: any) => AppDataSource.getRepository(entity);
-/*
-const Users: I_User[] = [
-    {
-        id: 1,
-        name: "Miguel Riveros",
-        email: "miguel@example.com",
-        password: "securepassword1", // Recuerda que este es solo un ejemplo.
-        birthdate: new Date("1990-05-15"), // Formato de fecha
-        nDni: 12345678,
-        credentialsId: 1,
-        role: "admin"
-    },
-    {
-        id: 2,
-        name: "Ana Pérez",
-        email: "ana@example.com",
-        password: "securepassword2",
-        birthdate: new Date("1992-08-22"),
-        nDni: 87654321,
-        credentialsId: 2,
-        role: "user"
+export const createUserS = async (userData: I_UserData): Promise<User|string> => {
+    const queryRunner = AppDataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+        // Verificar si ya existe un usuario con el mismo DNI
+        const existingUser = await userRepository.findOne({ where: { nDni: userData.nDni } });
+        
+        if (existingUser) {
+            return "este Dni ya ha sido registrado perro";
+        }
+
+        const existingUser_=await userRepository.findOne({where:{email:userData.email}})
+
+        if(existingUser_){
+            return "este Email ya ha sido registrado perro";
+        }
+
+        // Crear el usuario
+        const user: User = await queryRunner.manager.save(
+            userRepository.create({
+                name: userData.name,
+                email: userData.email,
+                password: userData.password,
+                birthdate: userData.birthdate,
+                nDni: userData.nDni,
+                role: userData.role,
+            })
+        ) as User;
+
+        // Crear la credencial asociando el userId
+        const credential: Credential = await createCredentialS(userData.email, userData.password, null);
+
+        // Asignar el ID de la credencial al usuario
+        user.credential = credential;
+
+        // Guardar el usuario actualizado con la credencial
+        await queryRunner.manager.save(user);
+
+        SavedUserInCredentialS(user,credential.id);
+
+        // Confirmar la transacción
+        await queryRunner.commitTransaction();
+        return user;
+
+    } catch (error) {
+        // Revertir la transacción en caso de error
+        await queryRunner.rollbackTransaction();
+        throw error;
+
+    } finally {
+        // Liberar el QueryRunner
+        await queryRunner.release();
     }
-];
-
-
-const Credentials: I_Credential[] = [
-    {
-        id: 1,
-        username: "miguel_riveros",
-        password: "securepassword1"
-    },
-    {
-        id: 2,
-        username: "ana_perez",
-        password: "securepassword2"
-    }
-];
-
-*/
-
-export const createUserS = async (userData: I_UserData): Promise<User> => {
-    const userRepository = Model(User);
-    const credentialRepository = Model(Credential);
-  
-    // Crear la credencial primero
-    const newCredential = credentialRepository.create({
-        username: userData.email, // Asumiendo que el email será el username
-        password: userData.password,
-    });
-    
-    // Guardar la credencial
-    const savedCredential = await credentialRepository.save(newCredential);
-
-    // Crear el usuario con la relación a Credential
-    const user = userRepository.create({
-        name: userData.name,
-        password: userData.password,
-        email: userData.email,
-        birthdate: userData.birthdate,
-        nDni: userData.nDni,
-        role: userData.role,
-        credential: savedCredential, // Relación con Credential
-    });
-
-    // Guardar el usuario
-    const result = await userRepository.save(user) as User;
-    
-    return result;
 };
 
-
-
-
 export const deleteUserS = async (id: number): Promise<void> => {
-    const userRepository = Model(User);
     const user = await userRepository.findOneBy({ id });
     
     if (user) {
@@ -96,7 +74,6 @@ export const deleteUserS = async (id: number): Promise<void> => {
 
 
 export const getUserS = async ():Promise<User[]> => {
-    const userRepository = Model(User);
     const users:User[] = await userRepository.find({
         
         relations:{
@@ -121,7 +98,6 @@ export const getUserS = async (): Promise<User[]> => {
 */
 
 export const getUserByIdS = async (id: number):Promise<User|null>=> {
-    const userRepository = Model(User);
 
     const user:User|null = await userRepository.findOne({
     
@@ -138,23 +114,19 @@ export const getUserByIdS = async (id: number):Promise<User|null>=> {
     return user;
 };
 
-export const loginUserS = async (username: string, password: string): Promise<I_User | null> => {
-    const credentialRepository = Model(Credential);
-    const userRepository = Model(User);
-
-    // Buscar las credenciales en la base de datos
-    const credential = await credentialRepository.findOne({
-        where: { username, password }
-    });
+export const loginUserS = async (username: string, password: string): Promise<User | null> => {
+    // Validar las credenciales
+    const credential = await validateCredentialS(username, password);
 
     if (!credential) {
-        return null; // Retornar null si no se encuentra la credencial
+        return null; // Si las credenciales no son válidas, retornar null
     }
 
-    // Buscar el usuario asociado a las credenciales
-    const user:I_User = await userRepository.findOne({
-        where: { credentialsId: credential.id }
-    })as I_User;
+    // Buscar el usuario asociado a las credenciales válidas
+    const user: User | null = await userRepository.findOne({
+        where: { credential: { username } },
+        relations: ["credential"] // Asegúrate de incluir las relaciones necesarias
+    });
 
-    return user || null; // Retornar el usuario o null si no se encuentra
+    return user; // Retornar el usuario o null si no se encuentra
 };

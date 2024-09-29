@@ -1,0 +1,28 @@
+\dt
+\q
+CREATE DATABASE database_1;
+\l
+\c database_1 
+\dt
+\dt
+\l
+select database_1
+\q
+\c database_1 
+\l
+\dt
+SELECT * FROM users
+;
+SELECT * FROM users;
+SELECT * FROM users;
+\q
+\c
+\c database_1
+\l
+\q
+\c database_1
+\dt
+\h
+\c user
+\c users
+\s users

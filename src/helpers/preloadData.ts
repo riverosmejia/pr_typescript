@@ -1,10 +1,12 @@
-import { AppDataSource } from "../config/appDataSource";
+import { AppDataSource,getRepository } from "../config/appDataSource";
 import { User } from "../entities/User"; // Importa la entidad User
 import { Appointment } from "../entities/Appointment"; // Importa la entidad Appointment
 import {Credential} from "../entities/Credential"
 import moment from "moment";
 
-const Model = (entity: any) => AppDataSource.getRepository(entity);
+const Model = (entity: any) => getRepository(entity);
+
+
 
 const users = [
     {
@@ -12,7 +14,7 @@ const users = [
         "email": "juan.perez@example.com",
         "password": "hashedpassword1",
         "birthdate": new Date("1990-01-15"),
-        "nDni": 12345678,
+        "nDni": 123,
         "role": "user"
     },
     {
@@ -20,7 +22,7 @@ const users = [
         "email": "maria.garcia@example.com",
         "password": "hashedpassword2",
         "birthdate": new Date("1985-03-20"),
-        "nDni": 23456789,
+        "nDni": 234,
         "role": "user"
     },
     {
@@ -28,7 +30,7 @@ const users = [
         "email": "carlos.lopez@example.com",
         "password": "hashedpassword3",
         "birthdate": new Date("1992-07-25"),
-        "nDni": 34567890,
+        "nDni": 345,
         "role": "user"
     },
     {
@@ -36,14 +38,14 @@ const users = [
         "email": "ana.torres@example.com",
         "password": "hashedpassword4",
         "birthdate": new Date("1995-11-10"),
-        "nDni": 45678901,
+        "nDni": 456,
         "role": "user"
     }
 ];
 
 const appointments = [
     {
-        "userId": 1,
+        "userId": 4,
         "date": new Date("2024-09-30"),
         "time": moment("10:00:00", "HH:mm:ss").format("HH:mm:ss"),
         "status": "active"
@@ -90,54 +92,110 @@ const appointments = [
         "time": moment("15:30:00", "HH:mm:ss").format("HH:mm:ss"),
         "status": "active"
     }
-];
+]; 
+
+
 
 export const PreLoadData = async () => {
-    await AppDataSource.manager.transaction(async (transactionalEntityManager) => {
-        let usersList = [];
 
-        for (let i = 0; i < users.length; i++) {
-            // Crear la credencial para cada usuario
-            const credential = await Model(Credential).create({
-                username: users[i].email, // Asigna el correo como nombre de usuario
-                password: users[i].password // Asigna la contraseña
-            });
 
-            // Guarda la credencial
-            await transactionalEntityManager.save(credential);
+    const queryRunner = AppDataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-            // Crea el usuario y asigna la credencial
-            const user = await Model(User).create({
-                ...users[i], // Copia el resto de los datos del usuario
-                credential: credential // Asigna la credencial recién creada
-            });
 
-            // Guarda el usuario
-            await transactionalEntityManager.save(user);
+    try {
 
-            // Agrega el usuario a la lista
-            usersList.push(user);
+        const users_ = await queryRunner.manager.find(User);
+
+        if (!users_.length) {
+            let usersList = [];
+
+            for (let i = 0; i < users.length; i++) {
+
+                //crear la credencial con la info del usuario
+
+                const credential = await queryRunner.manager.save(
+                    Model(Credential).create({
+                        username: users[i].email,
+                        password: users[i].password
+                    })
+                );
+
+                //crear el usuario y  metelrle la credencial de arriba
+
+                const user = await queryRunner.manager.save(
+                    Model(User).create({
+                        name: users[i].name,
+                        email: users[i].email,
+                        password: users[i].password,
+                        birthdate: users[i].birthdate,
+                        nDni: users[i].nDni,
+                        role: users[i].role,
+                        credential: credential
+                    })
+                );
+
+
+
+                credential.user = user; // Relacionamos la credencial aquí
+                await queryRunner.manager.save(credential);
+                
+                /*el userList se usaba abajo en las credenciales, ya no, lo dejo por si hago una
+                modificación luego, si lo dejé perdón, se me olvidó borrarlo, me perdonas?*/
+
+                usersList.push(user);
+            }
+
+
+
+            for (let j = 0; j < appointments.length; j++) {
+
+                // Busca al usuario por userId usando el queryRunner
+
+                const userId = appointments[j].userId; // Obtén el userId de la cita
+
+                const user = await queryRunner.manager.findOne(User, { where: { id: userId } }); // Consulta directa
+            
+                if (!user) {
+                    console.error(`Usuario con ID ${userId} no encontrado.`);
+                    continue; // Salta al siguiente ciclo si el usuario no existe
+                }
+            
+                await queryRunner.manager.save(
+                    Model(Appointment).create({
+                        date: appointments[j].date,
+                        time: appointments[j].time,
+                        status: appointments[j].status,
+                        user: user
+                    })
+                );
+            
+            }            
+
+            console.log("Datos precargados exitosamente con credenciales y citas.");
         }
 
-        let appointmentsList = [];
+        // Si todo es exitoso, confirma la transacción
+        await queryRunner.commitTransaction();
 
-        for (let j = 0; j < appointments.length; j++) {
-            // Busca el usuario correspondiente usando el userId del appointment
-            const user = usersList[appointments[j].userId - 1]; // Ajusta el índice
+    } catch (error) {
 
-            // Crea la cita y asigna el usuario
-            const appointment = await Model(Appointment).create({
-                ...appointments[j], // Copia los demás datos de la cita
-                user: user // Asigna el usuario relacionado
-            });
+        // Si algo falla, deshace la transacción
+        await queryRunner.rollbackTransaction();
+        console.error("Error en la precarga de datos:", error);
 
-            // Guarda la cita
-            await transactionalEntityManager.save(appointment);
-            appointmentsList.push(appointment);
-        }
+    } finally {
 
-        console.log("Datos precargados exitosamente con credenciales y citas");
-    });
+        // Libera el QueryRunner
+        await queryRunner.release();
+
+    }
 };
+
+
+
+
+
 
 
