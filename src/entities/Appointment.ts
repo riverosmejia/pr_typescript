@@ -27,6 +27,9 @@ export class Appointment {
   @Column({ type: "time", nullable: false })
   time: string;
 
+  @Column({type:"varchar",nullable:false})
+  Asunto:string;
+
   @ManyToOne(() => User, user => user.appointments, { onDelete: 'CASCADE' }) 
   @JoinColumn() // Aquí está la columna de unión que creará automáticamente userId
   user: User;

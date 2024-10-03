@@ -8,6 +8,8 @@ const Model = (entity: any) => getRepository(entity);
 
 
 
+//Datos precargados
+
 const users = [
     {
         "name": "Juan Pérez",
@@ -45,52 +47,60 @@ const users = [
 
 const appointments = [
     {
-        "userId": 4,
+        "userId": 1,
         "date": new Date("2024-09-30"),
         "time": moment("10:00:00", "HH:mm:ss").format("HH:mm:ss"),
-        "status": "active"
+        "status": "active",
+        "Asunto":"Consulta"
     },
     {
         "userId": 1,
         "date": new Date("2024-10-05"),
         "time": moment("11:00:00", "HH:mm:ss").format("HH:mm:ss"),
-        "status": "active"
+        "status": "active",
+        "Asunto":"Revisión"
     },
     {
         "userId": 2,
         "date": new Date("2024-10-01"),
         "time": moment("10:30:00", "HH:mm:ss").format("HH:mm:ss"),
-        "status": "active"
+        "status": "active",
+        "Asunto":"Consulta"
     },
     {
         "userId": 2,
         "date": new Date("2024-10-08"),
         "time": moment("12:00:00", "HH:mm:ss").format("HH:mm:ss"),
-        "status": "active"
+        "status": "active",
+        "Asunto":"Terapia"
     },
     {
         "userId": 3,
         "date": new Date("2024-10-02"),
         "time": moment("09:30:00", "HH:mm:ss").format("HH:mm:ss"),
-        "status": "active"
+        "status": "active",
+        "Asunto":"Consulta"
     },
     {
         "userId": 3,
         "date": new Date("2024-10-09"),
         "time": moment("14:00:00", "HH:mm:ss").format("HH:mm:ss"),
-        "status": "active"
+        "status": "active",
+        "Asunto":"Cirujía"
     },
     {
         "userId": 4,
         "date": new Date("2024-10-03"),
         "time": moment("08:00:00", "HH:mm:ss").format("HH:mm:ss"),
-        "status": "active"
+        "status": "active",
+        "Asunto":"Revisión"
     },
     {
         "userId": 4,
         "date": new Date("2024-10-10"),
         "time": moment("15:30:00", "HH:mm:ss").format("HH:mm:ss"),
-        "status": "active"
+        "status": "active",
+        "Asunto":"Consulta"
     }
 ]; 
 
@@ -167,6 +177,7 @@ export const PreLoadData = async () => {
                         date: appointments[j].date,
                         time: appointments[j].time,
                         status: appointments[j].status,
+                        Asunto:appointments[j].Asunto,
                         user: user
                     })
                 );

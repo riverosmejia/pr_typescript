@@ -55,4 +55,3 @@ export const validateCredentialS = async (username: string, password: string): P
     
     return null; // Retornar null si no son válidas
 };
-

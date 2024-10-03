@@ -20,13 +20,24 @@ export const getAllAppointmentsS = async (): Promise<I_AppointmentResponse[]> =>
         },
         date: app.date,
         time: app.time, // Mantiene el tiempo como string (importante)
-        status: app.status === AppointmentStatus.ACTIVE
+        status: app.status === AppointmentStatus.ACTIVE,
+        Asunto:app.Asunto
     }));
 };
 
+export const getAppointmentsByUserIdS = async (userId: number): Promise<Appointment[]> => {
 
+    const appointments = await appointmentRepository.find({
+        where: {
+            user: {
+                id: userId, // Filtra por la relación con User
+            },
+        },
+        relations: ['user'], // Carga la relación con el usuario
+    });
 
-
+    return appointments; // Devuelve los appointments encontrados
+};
 
 export const getAppointmentByIdS = async (id: number): Promise<I_AppointmentResponse | null> => {
 
@@ -42,6 +53,7 @@ export const getAppointmentByIdS = async (id: number): Promise<I_AppointmentResp
             time: appointment.time, // Almacena como string
             user: appointment.user, // ID del usuario relacionado
             status: appointment.status === 'active', // Convierte a booleano
+            Asunto:appointment.Asunto
         };
     }
 
@@ -62,6 +74,7 @@ export const scheduleAppointmentS = async (newAppointment: I_Appoinment): Promis
         date: newAppointment.date,
         time: formattedTime.format('HH:mm'), // Formatea el tiempo correctamente
         status: AppointmentStatus.ACTIVE,
+        Asunto: newAppointment.Asunto
     });
 
     const result = await appointmentRepository.save(appointment) as Appointment;

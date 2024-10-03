@@ -1,11 +1,24 @@
 import { Request, Response } from 'express';
-import { getAllAppointmentsS, getAppointmentByIdS, scheduleAppointmentS, cancelAppointmentS } from '../controller/services/appointmentServices'; // Asegúrate de que la ruta sea correcta
+import { getAllAppointmentsS, getAppointmentByIdS,getAppointmentsByUserIdS, scheduleAppointmentS, cancelAppointmentS } from '../controller/services/appointmentServices'; // Asegúrate de que la ruta sea correcta
 import I_Appoinment from '../../dto/I_appoinment';
 
 export const getAllAppointments = async (req: Request, res: Response) => {
 
     const appointments = await getAllAppointmentsS();
     res.status(200).json(appointments);
+
+};
+
+export const getAppointmentByIdUser = async (req: Request, res: Response) => {
+
+    const {id} = req.params;
+    const appointments = await getAppointmentsByUserIdS(Number(id));
+
+    if(appointments){
+        res.status(200).json(appointments);
+    } else {
+        res.status(404).json({message:'Turnos de Usuario no Encontrado'});
+    }
 
 };
 
@@ -33,7 +46,7 @@ export const scheduleAppointment = async (req: Request, res: Response) => {
 
 export const cancelAppointment = async (req: Request, res: Response) => {
 
-    const { id } = req.body;
+    const { id } = req.params;
     const Id =parseInt(id);
     const canceledAppointment = await cancelAppointmentS(Id);
 

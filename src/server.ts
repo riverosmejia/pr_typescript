@@ -1,8 +1,15 @@
 import express from 'express';
 import router  from './users/index';
 import appRouter from  './appointmens/AppoinmentRoutes';
+import cors from "cors";
 
 const server=express();
+
+server.use(cors({
+  origin: 'http://localhost:5173',  // Ajusta esto a la URL de tu frontend
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 server.use(express.json());
 

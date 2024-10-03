@@ -9,7 +9,8 @@ interface I_AppointmentResponse {
     date: Date;
     time: string; // Cambiado a string para la respuesta
     user: IUser; // Incluye el objeto user
-    status: boolean; // Cambiado a boolean para representar "active" como true y "cancelled" como false
+    status: boolean; 
+    Asunto:String // Cambiado a boolean para representar "active" como true y "cancelled" como false
 }
 
 

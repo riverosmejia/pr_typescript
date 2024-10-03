@@ -13,7 +13,7 @@ export const AppDataSource = new DataSource({
     database: DATABASE,
     synchronize: true,
     //el de abajo es para quitar o poner los datos de SQL en la terminal.
-    logging: true,
+    logging: false,
     //el de abajo es para quitar datos cada vez que se reinicie el programa
     dropSchema:true,
     entities: [User, Appointment, Credential],

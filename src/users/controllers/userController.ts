@@ -83,7 +83,7 @@ export const loginUser = async (req: Request, res: Response) => {
 
 
         // Llamamos al servicio de login para autenticar al usuario
-        const user: I_User | null = await loginUserS(username, password);
+        const user: User | null = await loginUserS(username, password);
 
         // Si no se encuentra el usuario, respondemos con un error 401
         if (!user) {
